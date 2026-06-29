@@ -1,0 +1,21 @@
+# ==============================================================================
+# LectureLens Multi-Modal Analyzer - Core System Requirements
+# ==============================================================================
+
+# Core Web Application Framework
+streamlit>=1.35.0
+
+# Multi-Modal Document Text Extraction
+pypdf>=4.2.0
+
+# Local SLM/LLM Inference Interface Layer
+ollama>=0.2.1
+
+# Local Audio Processing & Whisper Binding Engine
+pywhispercpp>=1.2.0
+
+pytest>=8.0.0
+
+pytest-cov>=5.0.0
+
+pip-audit>=2.7.0

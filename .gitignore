@@ -1,0 +1,19 @@
+# Python Core Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+
+# Local Application Data & Backups
+*.db
+*.db-journal
+uploads/
+chunks/
+
+# Environment Configurations & Secrets
+.env
+.venv
+env/
+venv/

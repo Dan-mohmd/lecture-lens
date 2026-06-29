@@ -1,0 +1,53 @@
+stages:
+  - lint
+  - format
+  - type_check
+  - security
+  - test
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR\\.cache\\pip"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .cache/pip/
+    - .venv/
+
+before_script:
+  # Initialize venv and install tools explicitly inside the local workspace venv
+  - powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not (Test-Path .venv)) { python -m venv .venv }"
+  - .\.venv\Scripts\python.exe -m pip install --upgrade pip
+  - .\.venv\Scripts\pip.exe install -r requirements.txt
+  - .\.venv\Scripts\pip.exe install ruff mypy pip-audit pytest pytest-cov detect-secrets
+
+ruff-lint:
+  stage: lint
+  script:
+    - .\.venv\Scripts\ruff.exe check .
+
+ruff-format:
+  stage: format
+  script:
+    - .\.venv\Scripts\ruff.exe format --check .
+
+mypy-typecheck:
+  stage: type_check
+  script:
+    - .\.venv\Scripts\mypy.exe app/
+
+dependency-audit:
+  stage: security
+  script:
+    - .\.venv\Scripts\pip-audit.exe
+
+secret-scanning:
+  stage: security
+  script:
+    - .\.venv\Scripts\detect-secrets.exe scan .
+
+pytest-coverage:
+  stage: test
+  script:
+    - .\.venv\Scripts\pytest.exe --cov=app tests/ --cov-report=term-missing
+  coverage: '/TOTAL.*?(\d+\%)/'
