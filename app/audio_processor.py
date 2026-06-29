@@ -3,19 +3,23 @@ import math
 import sqlite3
 import subprocess
 import json
+import shutil
 from database import DB_FILE, save_chunk_transcript
 
 WINGET_FFMPEG_BIN = r"C:\Users\muham\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin"
 
-
 def get_ffmpeg_cmd(binary_name):
-    """Ensures subprocess can resolve the binary path inside isolated Streamlit loops."""
-    if subprocess.run(["where", binary_name], capture_output=True).returncode == 0:
+    # shutil.which automatically handles 'where' on Windows and 'which' on Linux
+    resolved_path = shutil.which(binary_name)
+    if resolved_path:
         return binary_name
-    absolute_path = os.path.join(WINGET_FFMPEG_BIN, f"{binary_name}.exe")
-    if os.path.exists(absolute_path):
-        return absolute_path
-    return binary_name
+        
+    # Standard environmental fallback if not globally registered in PATH
+    fallback_path = os.getenv("FFMPEG_BINARY_PATH")
+    if fallback_path and os.path.exists(fallback_path):
+        return fallback_path
+        
+    raise FileNotFoundError(f"System binary '{binary_name}' was not detected globally or via FFMPEG_BINARY_PATH.")
 
 
 def get_audio_duration_and_convert(file_path, target_wav):
